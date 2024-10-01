@@ -28,6 +28,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -142,6 +143,18 @@ public class SystemWebChromeClient extends WebChromeClient {
         }
         return true;
     }
+
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage)
+    {
+        boolean isDebuggable =  ( 0 != ( this.appContext.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) );
+        if (!isDebuggable && consoleMessage.message() != null){
+            LOG.i(LOG_TAG, "%s, source: %s (%d)" , consoleMessage.message(), consoleMessage.sourceId() , consoleMessage.lineNumber());
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Handle database quota exceeded notification.
